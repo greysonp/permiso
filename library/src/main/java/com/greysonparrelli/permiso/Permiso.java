@@ -23,6 +23,16 @@ public class Permiso {
     // Creation
     // =====================================================================
 
+    /**
+     * <p>
+     *     Create a new instance of Permiso to help you manage permission requests.
+     * </p>
+     * <p>
+     *     You should only create one instance of Permiso per activity. Be very careful not to leak your activity by
+     *     giving this instance to objects whose lifecycle exists outside of your activity!
+     * </p>
+     * @param activity The activity that will be requesting permissions.
+     */
     public Permiso(@NonNull Activity activity) {
         mActivity = activity;
         mCodesToRequests = new HashMap<>();
@@ -33,18 +43,23 @@ public class Permiso {
     // Public
     // =====================================================================
 
-    public void requestPermission(@NonNull IOnPermissionResult listener, String... permissions) {
-        final RequestData requestData = new RequestData(listener, permissions);
+    /**
+     * Request one or more permissions from the system.
+     * @param callback    A callback that will be triggered when the results of your permission request are available.
+     * @param permissions A list of permission constants that you are requesting. Use constants from {@link android.Manifest.permission}.
+     */
+    public void requestPermissions(@NonNull IOnPermissionResult callback, String... permissions) {
+        final RequestData requestData = new RequestData(callback, permissions);
 
         // Mark any permissions that are already granted
         for (String permission : permissions) {
             if (ContextCompat.checkSelfPermission(mActivity, permission) == PackageManager.PERMISSION_GRANTED) {
-                requestData.resultSet.satisfyPermissions(permission);
+                requestData.resultSet.grantPermissions(permission);
             }
         }
 
         // If we had all of them, yay! No need to do anything else.
-        if (requestData.resultSet.areAllPermissionsSatisfied()) {
+        if (requestData.resultSet.areAllPermissionsGranted()) {
             requestData.onResultListener.onPermissionResult(requestData.resultSet);
         } else {
             // If we have some unsatisfied ones, let's first see if they can be satisfied by an active request. If it
@@ -56,11 +71,18 @@ public class Permiso {
             if (!linkedToExisting) {
                 int requestCode = mActiveRequestCode++;
                 mCodesToRequests.put(requestCode, requestData);
-                ActivityCompat.requestPermissions(mActivity, requestData.resultSet.getUnsatisfiedPermissions(), requestCode);
+                ActivityCompat.requestPermissions(mActivity, requestData.resultSet.getUngrantedPermissions(), requestCode);
             }
         }
     }
 
+    /**
+     * This method needs to be called by your activity's {@link Activity#onRequestPermissionsResult(int, String[], int[])}.
+     * Simply forward the results of that method here.
+     * @param requestCode  The request code given to you by {@link Activity#onRequestPermissionsResult(int, String[], int[])}.
+     * @param permissions  The permissions given to you by {@link Activity#onRequestPermissionsResult(int, String[], int[])}.
+     * @param grantResults The grant results given to you by {@link Activity#onRequestPermissionsResult(int, String[], int[])}.
+     */
     public void onPermissionResultsRetrieved(int requestCode, String[] permissions, int[] grantResults) {
         if (mCodesToRequests.containsKey(requestCode)) {
             RequestData requestData = mCodesToRequests.get(requestCode);
@@ -82,7 +104,7 @@ public class Permiso {
         for (final RequestData activeRequest : mCodesToRequests.values()) {
             // If we find one that can satisfy all of the new request's permissions, we re-wire the active one's
             // callback to also call this new one's callback
-            if (activeRequest.resultSet.containsAllUnsatisfiedPermissions(newRequest.resultSet)) {
+            if (activeRequest.resultSet.containsAllUngrantedPermissions(newRequest.resultSet)) {
                 final IOnPermissionResult originalOnResultListener = activeRequest.onResultListener;
                 activeRequest.onResultListener = new IOnPermissionResult() {
                     @Override
@@ -91,9 +113,9 @@ public class Permiso {
                         originalOnResultListener.onPermissionResult(resultSet);
 
                         // Next, copy over the results to the new one's resultSet
-                        String[] unsatisfied = newRequest.resultSet.getUnsatisfiedPermissions();
+                        String[] unsatisfied = newRequest.resultSet.getUngrantedPermissions();
                         for (String permission : unsatisfied) {
-                            newRequest.resultSet.requestResults.put(permission, resultSet.isPermissionSatisfied(permission));
+                            newRequest.resultSet.requestResults.put(permission, resultSet.isPermissionGranted(permission));
                         }
 
                         // Finally, trigger the new one's callback
@@ -112,7 +134,14 @@ public class Permiso {
     // Inner Classes
     // =====================================================================
 
+    /**
+     * A callback interface for receiving the results of a permission request.
+     */
     public interface IOnPermissionResult {
+        /**
+         * Invoked when the results of your permission request are ready.
+         * @param resultSet An object holding the result of your permission request.
+         */
         void onPermissionResult(ResultSet resultSet);
     }
 
@@ -126,33 +155,52 @@ public class Permiso {
         }
     }
 
+    /**
+     * A class representing the results of a permission request.
+     */
     public static class ResultSet {
 
         private Map<String, Boolean> requestResults;
 
-        public ResultSet(String... permissions) {
+        private ResultSet(String... permissions) {
             requestResults = new HashMap<>(permissions.length);
             for (String permission : permissions) {
                 requestResults.put(permission, false);
             }
         }
 
-        public boolean isPermissionSatisfied(String permission) {
+        /**
+         * Checks if a permission was granted during your permission request.
+         * @param permission The permission you are inquiring about. This should be a constant from {@link android.Manifest.permission}.
+         * @return True if the permission was granted, otherwise false.
+         */
+        public boolean isPermissionGranted(String permission) {
             if (requestResults.containsKey(permission)) {
                 return requestResults.get(permission);
             }
             return false;
         }
 
-        public boolean areAllPermissionsSatisfied() {
+        /**
+         * Determines if all permissions in the request were granted.
+         * @return True if all permissions in the request were granted, otherwise false.
+         */
+        public boolean areAllPermissionsGranted() {
             return !requestResults.containsValue(false);
         }
 
+        /**
+         * Returns a map representation of this result set. Useful if you'd like to do more complicated operations
+         * with the results.
+         * @return
+         *      A mapping of permission constants to booleans, where true indicates that the permission was granted,
+         *      and false indicates that the permission was denied.
+         */
         public Map<String, Boolean> toMap() {
             return new HashMap<>(requestResults);
         }
 
-        private void satisfyPermissions(String... permissions) {
+        private void grantPermissions(String... permissions) {
             for (String permission : permissions) {
                 requestResults.put(permission, true);
             }
@@ -164,19 +212,19 @@ public class Permiso {
             }
         }
 
-        private String[] getUnsatisfiedPermissions() {
-            List<String> unsatisfiedList = new ArrayList<>(requestResults.size());
+        private String[] getUngrantedPermissions() {
+            List<String> ungrantedList = new ArrayList<>(requestResults.size());
             for (String permission : requestResults.keySet()) {
                 if (!requestResults.get(permission)) {
-                    unsatisfiedList.add(permission);
+                    ungrantedList.add(permission);
                 }
             }
-            return unsatisfiedList.toArray(new String[unsatisfiedList.size()]);
+            return ungrantedList.toArray(new String[ungrantedList.size()]);
         }
 
-        private boolean containsAllUnsatisfiedPermissions(ResultSet set) {
-            List<String> unsatisfied = Arrays.asList(set.getUnsatisfiedPermissions());
-            return requestResults.keySet().containsAll(unsatisfied);
+        private boolean containsAllUngrantedPermissions(ResultSet set) {
+            List<String> ungranted = Arrays.asList(set.getUngrantedPermissions());
+            return requestResults.keySet().containsAll(ungranted);
         }
     }
 }
