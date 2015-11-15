@@ -69,9 +69,20 @@ public class Permiso {
             // If there was no existing request that can satisfy this one, then let's make a new permission request to
             // the system
             if (!linkedToExisting) {
-                int requestCode = mActiveRequestCode++;
-                mCodesToRequests.put(requestCode, requestData);
-                ActivityCompat.requestPermissions(mActivity, requestData.resultSet.getUngrantedPermissions(), requestCode);
+                // First check if there's any permissions for which we need to provide a rationale for using
+                String[] permissionsThatNeedRationale = requestData.resultSet.getPermissionsThatNeedRationale(mActivity);
+
+                // If there are some that need a rationale, show that rationale, then continue with the request
+                if (permissionsThatNeedRationale.length > 0) {
+                    requestData.onResultListener.onRationaleRequested(new IOnRationaleProvided() {
+                        @Override
+                        public void onRationaleProvided() {
+                            makePermissionRequest(requestData);
+                        }
+                    }, permissionsThatNeedRationale);
+                } else {
+                    makePermissionRequest(requestData);
+                }
             }
         }
     }
@@ -121,12 +132,23 @@ public class Permiso {
                         // Finally, trigger the new one's callback
                         newRequest.onResultListener.onPermissionResult(newRequest.resultSet);
                     }
+
+                    @Override
+                    public void onRationaleRequested(IOnRationaleProvided callback, String... permissions) {
+                        activeRequest.onResultListener.onRationaleRequested(callback, permissions);
+                    }
                 };
                 found = true;
                 break;
             }
         }
         return found;
+    }
+
+    private void makePermissionRequest(RequestData requestData) {
+        int requestCode = mActiveRequestCode++;
+        mCodesToRequests.put(requestCode, requestData);
+        ActivityCompat.requestPermissions(mActivity, requestData.resultSet.getUngrantedPermissions(), requestCode);
     }
 
 
@@ -143,6 +165,25 @@ public class Permiso {
          * @param resultSet An object holding the result of your permission request.
          */
         void onPermissionResult(ResultSet resultSet);
+
+        /**
+         * Called when the system recommends that you provide a rationale for a permission. This typically happens when
+         * a user denies a permission, but they you request it again.
+         * @param callback    A callback to be triggered when you are finished showing the user the rationale.
+         * @param permissions The list of permissions for which the system recommends you provide a rationale.
+         */
+        void onRationaleRequested(IOnRationaleProvided callback, String... permissions);
+    }
+
+    /**
+     * Simple callback to let Permiso know that you have finished providing the user a rationale for a set of permissions.
+     */
+    public interface IOnRationaleProvided {
+        /**
+         * Invoke this method when you are done providing a rationale to the user in
+         * {@link IOnPermissionResult#onRationaleRequested(IOnRationaleProvided, String...)}
+         */
+        void onRationaleProvided();
     }
 
     private static class RequestData {
@@ -225,6 +266,17 @@ public class Permiso {
         private boolean containsAllUngrantedPermissions(ResultSet set) {
             List<String> ungranted = Arrays.asList(set.getUngrantedPermissions());
             return requestResults.keySet().containsAll(ungranted);
+        }
+
+        private String[] getPermissionsThatNeedRationale(Activity activity) {
+            String[] ungranted = getUngrantedPermissions();
+            List<String> shouldShowRationale = new ArrayList<>(ungranted.length);
+            for (String permission : ungranted) {
+                if (ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
+                    shouldShowRationale.add(permission);
+                }
+            }
+            return shouldShowRationale.toArray(new String[shouldShowRationale.size()]);
         }
     }
 }

@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
         mPermiso.onPermissionResultsRetrieved(requestCode, permissions, grantResults);
     }
 
+
     // =====================================================================
     // Click Listeners
     // =====================================================================
@@ -74,6 +75,12 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     Toast.makeText(MainActivity.this, "Permission Denied.", Toast.LENGTH_SHORT).show();
                 }
+            }
+
+            @Override
+            public void onRationaleRequested(Permiso.IOnRationaleProvided callback, String... permissions) {
+                Toast.makeText(MainActivity.this, "Requested rationale.", Toast.LENGTH_SHORT).show();
+                callback.onRationaleProvided();
             }
         }, Manifest.permission.READ_EXTERNAL_STORAGE);
     }
@@ -94,6 +101,12 @@ public class MainActivity extends AppCompatActivity {
                 }
                 Toast.makeText(MainActivity.this, numGranted + "/2 Permissions Granted.", Toast.LENGTH_SHORT).show();
             }
+
+            @Override
+            public void onRationaleRequested(Permiso.IOnRationaleProvided callback, String... permissions) {
+                Toast.makeText(MainActivity.this, "Requested rationale.", Toast.LENGTH_SHORT).show();
+                callback.onRationaleProvided();
+            }
         }, Manifest.permission.READ_CONTACTS, Manifest.permission.READ_CALENDAR);
     }
 
@@ -111,6 +124,12 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, "Permission Denied. (1)", Toast.LENGTH_SHORT).show();
                 }
             }
+
+            @Override
+            public void onRationaleRequested(Permiso.IOnRationaleProvided callback, String... permissions) {
+                Toast.makeText(MainActivity.this, "Requested rationale. (1)", Toast.LENGTH_SHORT).show();
+                callback.onRationaleProvided();
+            }
         }, Manifest.permission.CAMERA);
 
         mPermiso.requestPermissions(new Permiso.IOnPermissionResult() {
@@ -121,6 +140,12 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     Toast.makeText(MainActivity.this, "Permission Denied. (2)", Toast.LENGTH_SHORT).show();
                 }
+            }
+
+            @Override
+            public void onRationaleRequested(Permiso.IOnRationaleProvided callback, String... permissions) {
+                Toast.makeText(MainActivity.this, "Requested rationale. (2)", Toast.LENGTH_SHORT).show();
+                callback.onRationaleProvided();
             }
         }, Manifest.permission.CAMERA);
     }
