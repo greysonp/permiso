@@ -1,8 +1,14 @@
+# Android
+local.properties
+
+# IntelliJ
 *.iml
-.gradle
-/local.properties
-/.idea/workspace.xml
-/.idea/libraries
+.idea/
+
+# OS X
 .DS_Store
-/build
-/captures
+
+# Gradle
+build
+/reports
+/.gradle
