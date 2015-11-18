@@ -48,5 +48,8 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.1.0'
 }
 
-apply from: rootProject.file('gradle/maven.gradle')
-apply from: rootProject.file('gradle/bintray.gradle')
+// Only add in the bintray stuff if we're building locally
+if (!"true".equalsIgnoreCase(System.getenv("CI"))) {
+    apply from: rootProject.file('gradle/maven.gradle')
+    apply from: rootProject.file('gradle/bintray.gradle')
+}
