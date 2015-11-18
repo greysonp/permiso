@@ -1,10 +1,13 @@
 package com.greysonparrelli.permiso;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -69,6 +72,9 @@ public class Permiso {
             // If there was no existing request that can satisfy this one, then let's make a new permission request to
             // the system
             if (!linkedToExisting) {
+                // Mark the request as active
+                final int requestCode = markRequestAsActive(requestData);
+
                 // First check if there's any permissions for which we need to provide a rationale for using
                 String[] permissionsThatNeedRationale = requestData.resultSet.getPermissionsThatNeedRationale(mActivity);
 
@@ -77,11 +83,11 @@ public class Permiso {
                     requestData.onResultListener.onRationaleRequested(new IOnRationaleProvided() {
                         @Override
                         public void onRationaleProvided() {
-                            makePermissionRequest(requestData);
+                            makePermissionRequest(requestCode);
                         }
                     }, permissionsThatNeedRationale);
                 } else {
-                    makePermissionRequest(requestData);
+                    makePermissionRequest(requestCode);
                 }
             }
         }
@@ -94,13 +100,36 @@ public class Permiso {
      * @param permissions  The permissions given to you by {@link Activity#onRequestPermissionsResult(int, String[], int[])}.
      * @param grantResults The grant results given to you by {@link Activity#onRequestPermissionsResult(int, String[], int[])}.
      */
-    public void onPermissionResultsRetrieved(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) {
         if (mCodesToRequests.containsKey(requestCode)) {
             RequestData requestData = mCodesToRequests.get(requestCode);
             requestData.resultSet.parsePermissionResults(permissions, grantResults);
             requestData.onResultListener.onPermissionResult(requestData.resultSet);
             mCodesToRequests.remove(requestCode);
         }
+    }
+
+    /**
+     * A helper to show your rationale in an {@link AlertDialog} when implementing
+     * {@link IOnRationaleProvided#onRationaleProvided()}. Automatically invokes the rationale callback when the user
+     * dismisses the dialog.
+     * @param title             The title of the dialog. If null, there will be no title.
+     * @param message           The message displayed in the dialog.
+     * @param buttonText        The text you want the button to show, e.g. "OK".
+     * @param rationaleCallback The callback to be trigger
+     */
+    public void showRationaleInDialog(@Nullable String title, String message, String buttonText, @NonNull final IOnRationaleProvided rationaleCallback) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+        builder.setTitle(title);
+        builder.setMessage(message);
+        builder.setPositiveButton(buttonText, null);
+        builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                rationaleCallback.onRationaleProvided();
+            }
+        });
+        builder.create().show();
     }
 
 
@@ -145,9 +174,14 @@ public class Permiso {
         return found;
     }
 
-    private void makePermissionRequest(RequestData requestData) {
+    private int markRequestAsActive(RequestData requestData) {
         int requestCode = mActiveRequestCode++;
         mCodesToRequests.put(requestCode, requestData);
+        return requestCode;
+    }
+
+    private void makePermissionRequest(int requestCode) {
+        RequestData requestData = mCodesToRequests.get(requestCode);
         ActivityCompat.requestPermissions(mActivity, requestData.resultSet.getUngrantedPermissions(), requestCode);
     }
 

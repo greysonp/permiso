@@ -3,13 +3,8 @@ package com.greysonparrelli.permisodemo;
 import android.Manifest;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.greysonparrelli.permiso.Permiso;
@@ -55,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        mPermiso.onPermissionResultsRetrieved(requestCode, permissions, grantResults);
+        mPermiso.onRequestPermissionResult(requestCode, permissions, grantResults);
     }
 
 
@@ -79,8 +74,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onRationaleRequested(Permiso.IOnRationaleProvided callback, String... permissions) {
-                Toast.makeText(MainActivity.this, "Requested rationale.", Toast.LENGTH_SHORT).show();
-                callback.onRationaleProvided();
+                mPermiso.showRationaleInDialog("Permission Rationale", "Needed for demo purposes.", "Ok", callback);
             }
         }, Manifest.permission.READ_EXTERNAL_STORAGE);
     }
@@ -104,8 +98,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onRationaleRequested(Permiso.IOnRationaleProvided callback, String... permissions) {
-                Toast.makeText(MainActivity.this, "Requested rationale.", Toast.LENGTH_SHORT).show();
-                callback.onRationaleProvided();
+                mPermiso.showRationaleInDialog("Permission Rationale", "Needed for demo purposes.", "Ok", callback);
             }
         }, Manifest.permission.READ_CONTACTS, Manifest.permission.READ_CALENDAR);
     }
@@ -127,8 +120,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onRationaleRequested(Permiso.IOnRationaleProvided callback, String... permissions) {
-                Toast.makeText(MainActivity.this, "Requested rationale. (1)", Toast.LENGTH_SHORT).show();
-                callback.onRationaleProvided();
+                mPermiso.showRationaleInDialog("Permission Rationale", "Needed for demo purposes.", "Ok", callback);
             }
         }, Manifest.permission.CAMERA);
 
@@ -144,8 +136,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onRationaleRequested(Permiso.IOnRationaleProvided callback, String... permissions) {
-                Toast.makeText(MainActivity.this, "Requested rationale. (2)", Toast.LENGTH_SHORT).show();
-                callback.onRationaleProvided();
+                mPermiso.showRationaleInDialog("Permission Rationale", "Needed for demo purposes.", "Ok", callback);
             }
         }, Manifest.permission.CAMERA);
     }
