@@ -118,18 +118,16 @@ public class Permiso {
      * @param buttonText        The text you want the button to show, e.g. "OK".
      * @param rationaleCallback The callback to be trigger
      */
-    public void showRationaleInDialog(@Nullable String title, String message, String buttonText, @NonNull final IOnRationaleProvided rationaleCallback) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
-        builder.setTitle(title);
-        builder.setMessage(message);
-        builder.setPositiveButton(buttonText, null);
-        builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+    public void showRationaleInDialog(@Nullable String title, @NonNull String message, @Nullable String buttonText, @NonNull final IOnRationaleProvided rationaleCallback) {
+        PermisoDialogFragment dialogFragment = PermisoDialogFragment.newInstance(title, message, buttonText);
+
+        dialogFragment.setOnDismissListener(new PermisoDialogFragment.IOnDismissListener() {
             @Override
-            public void onDismiss(DialogInterface dialog) {
+            public void onDismiss() {
                 rationaleCallback.onRationaleProvided();
             }
         });
-        builder.create().show();
+        dialogFragment.show(mActivity.getFragmentManager(), PermisoDialogFragment.TAG);
     }
 
 
