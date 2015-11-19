@@ -8,7 +8,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -74,6 +73,8 @@ public class Permiso {
      * This method should be invoked in the {@link Activity#onCreate(Bundle)} in every activity that requests
      * permissions. Even if you don't want to use Permiso in your current activity, you should call this method
      * with a null activity to prevent leaking the previously-set activity.
+     * <p>
+     * <strong>Important: </strong> If your activity subclasses {@link PermisoActivity}, this is already handled for you.
      * @param activity The activity that is currently active.
      */
     public void setActivity(@NonNull Activity activity) {
@@ -81,8 +82,8 @@ public class Permiso {
     }
 
     /**
-     * Request one or more permissions from the system. Make sure that you have set your current activity using
-     * {@link Permiso#setActivity(Activity)}!
+     * Request one or more permissions from the system. Make sure that you are either subclassing {@link PermisoActivity}
+     * or that you have set your current activity using {@link Permiso#setActivity(Activity)}!
      * @param callback
      *      A callback that will be triggered when the results of your permission request are available.
      * @param permissions
@@ -135,6 +136,8 @@ public class Permiso {
     /**
      * This method needs to be called by your activity's {@link Activity#onRequestPermissionsResult(int, String[], int[])}.
      * Simply forward the results of that method here.
+     * <p>
+     * <strong>Important: </strong> If your activity subclasses {@link PermisoActivity}, this is already handled for you.
      * @param requestCode
      *      The request code given to you by {@link Activity#onRequestPermissionsResult(int, String[], int[])}.
      * @param permissions
