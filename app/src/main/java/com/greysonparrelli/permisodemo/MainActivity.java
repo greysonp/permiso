@@ -68,7 +68,7 @@ public class MainActivity extends PermisoActivity {
 
             @Override
             public void onRationaleRequested(Permiso.IOnRationaleProvided callback, String... permissions) {
-                Permiso.getInstance().showRationaleInDialog("Permission Rationale", "Needed for demo purposes.", "Ok", callback);
+                Permiso.getInstance().showRationaleInDialog("Permission Rationale", "Needed for demo purposes.", null, callback);
             }
         }, Manifest.permission.READ_EXTERNAL_STORAGE);
     }
@@ -93,7 +93,7 @@ public class MainActivity extends PermisoActivity {
 
             @Override
             public void onRationaleRequested(Permiso.IOnRationaleProvided callback, String... permissions) {
-                Permiso.getInstance().showRationaleInDialog("Permission Rationale", "Needed for demo purposes.", "Ok", callback);
+                Permiso.getInstance().showRationaleInDialog("Permission Rationale", "Needed for demo purposes.", null, callback);
             }
         }, Manifest.permission.READ_CONTACTS, Manifest.permission.READ_CALENDAR);
     }
@@ -116,7 +116,7 @@ public class MainActivity extends PermisoActivity {
 
             @Override
             public void onRationaleRequested(Permiso.IOnRationaleProvided callback, String... permissions) {
-                Permiso.getInstance().showRationaleInDialog("Permission Rationale", "Needed for demo purposes.", "Ok", callback);
+                Permiso.getInstance().showRationaleInDialog("Permission Rationale", "Needed for demo purposes.", null, callback);
             }
         }, Manifest.permission.CAMERA);
 
@@ -133,7 +133,7 @@ public class MainActivity extends PermisoActivity {
 
             @Override
             public void onRationaleRequested(Permiso.IOnRationaleProvided callback, String... permissions) {
-                Permiso.getInstance().showRationaleInDialog("Permission Rationale", "Needed for demo purposes.", "Ok", callback);
+                Permiso.getInstance().showRationaleInDialog("Permission Rationale", "Needed for demo purposes.", null, callback);
             }
         }, Manifest.permission.CAMERA);
     }
