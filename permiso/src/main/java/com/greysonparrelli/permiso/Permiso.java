@@ -1,8 +1,9 @@
 package com.greysonparrelli.permiso;
 
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.os.Bundle;
+import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -15,11 +16,35 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A class to make permission-management easier. Provides methods to conveniently request permissions anywhere in your
+ * app.
+ */
 public class Permiso {
 
+    /**
+     * A map to keep track of our outstanding permission requests. The key is the request code sent when we call
+     * {@link ActivityCompat#requestPermissions(Activity, String[], int)}. The value is the {@link Permiso.RequestData}
+     * bundle that holds all of the request information.
+     */
     private Map<Integer, RequestData> mCodesToRequests;
+
+    /**
+     * The active activity. Used to make permissions requests. This must be set by the library-user through
+     * {@link Permiso#setActivity(Activity)} or else bad things will happen.
+     */
     private Activity mActivity;
+
+    /**
+     * This is just a value we increment to generate new request codes for use with
+     * {@link ActivityCompat#requestPermissions(Activity, String[], int)}.
+     */
     private int mActiveRequestCode = 1;
+
+    /**
+     * The singleton instance.
+     */
+    private static Permiso sInstance = new Permiso();
 
 
     // =====================================================================
@@ -27,17 +52,16 @@ public class Permiso {
     // =====================================================================
 
     /**
-     * <p>
-     *     Create a new instance of Permiso to help you manage permission requests.
-     * </p>
-     * <p>
-     *     You should only create one instance of Permiso per activity. Be very careful not to leak your activity by
-     *     giving this instance to objects whose lifecycle exists outside of your activity!
-     * </p>
-     * @param activity The activity that will be requesting permissions.
+     * @return An instance of {@link Permiso} to help you manage your permissions.
      */
-    public Permiso(@NonNull Activity activity) {
-        mActivity = activity;
+    public static Permiso getInstance() {
+        return sInstance;
+    }
+
+    /**
+     * Implementing a singleton pattern, so this is private.
+     */
+    private Permiso() {
         mCodesToRequests = new HashMap<>();
     }
 
@@ -47,10 +71,25 @@ public class Permiso {
     // =====================================================================
 
     /**
-     * Request one or more permissions from the system.
-     * @param callback    A callback that will be triggered when the results of your permission request are available.
-     * @param permissions A list of permission constants that you are requesting. Use constants from {@link android.Manifest.permission}.
+     * This method should be invoked in the {@link Activity#onCreate(Bundle)} in every activity that requests
+     * permissions. Even if you don't want to use Permiso in your current activity, you should call this method
+     * with a null activity to prevent leaking the previously-set activity.
+     * @param activity The activity that is currently active.
      */
+    public void setActivity(@NonNull Activity activity) {
+        mActivity = activity;
+    }
+
+    /**
+     * Request one or more permissions from the system. Make sure that you have set your current activity using
+     * {@link Permiso#setActivity(Activity)}!
+     * @param callback
+     *      A callback that will be triggered when the results of your permission request are available.
+     * @param permissions
+     *      A list of permission constants that you are requesting. Use constants from
+     *      {@link android.Manifest.permission}.
+     */
+    @MainThread
     public void requestPermissions(@NonNull IOnPermissionResult callback, String... permissions) {
         final RequestData requestData = new RequestData(callback, permissions);
 
@@ -96,10 +135,14 @@ public class Permiso {
     /**
      * This method needs to be called by your activity's {@link Activity#onRequestPermissionsResult(int, String[], int[])}.
      * Simply forward the results of that method here.
-     * @param requestCode  The request code given to you by {@link Activity#onRequestPermissionsResult(int, String[], int[])}.
-     * @param permissions  The permissions given to you by {@link Activity#onRequestPermissionsResult(int, String[], int[])}.
-     * @param grantResults The grant results given to you by {@link Activity#onRequestPermissionsResult(int, String[], int[])}.
+     * @param requestCode
+     *      The request code given to you by {@link Activity#onRequestPermissionsResult(int, String[], int[])}.
+     * @param permissions
+     *      The permissions given to you by {@link Activity#onRequestPermissionsResult(int, String[], int[])}.
+     * @param grantResults
+     *      The grant results given to you by {@link Activity#onRequestPermissionsResult(int, String[], int[])}.
      */
+    @MainThread
     public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) {
         if (mCodesToRequests.containsKey(requestCode)) {
             RequestData requestData = mCodesToRequests.get(requestCode);
@@ -110,20 +153,27 @@ public class Permiso {
     }
 
     /**
-     * A helper to show your rationale in an {@link AlertDialog} when implementing
+     * A helper to show your rationale in a {@link android.app.DialogFragment} when implementing
      * {@link IOnRationaleProvided#onRationaleProvided()}. Automatically invokes the rationale callback when the user
      * dismisses the dialog.
-     * @param title             The title of the dialog. If null, there will be no title.
-     * @param message           The message displayed in the dialog.
-     * @param buttonText        The text you want the button to show, e.g. "OK".
-     * @param rationaleCallback The callback to be trigger
+     * @param title
+     *      The title of the dialog. If null, there will be no title.
+     * @param message
+     *      The message displayed in the dialog.
+     * @param buttonText
+     *      The text you want the dismissal button to show. If null, defaults to {@link android.R.string#ok}.
+     * @param rationaleCallback
+     *      The callback to be trigger
      */
+    @MainThread
     public void showRationaleInDialog(@Nullable String title, @NonNull String message, @Nullable String buttonText, @NonNull final IOnRationaleProvided rationaleCallback) {
         PermisoDialogFragment dialogFragment = PermisoDialogFragment.newInstance(title, message, buttonText);
 
-        dialogFragment.setOnDismissListener(new PermisoDialogFragment.IOnDismissListener() {
+        // We show the rationale after the dialog is closed. We use setRetainInstance(true) in the dialog to ensure that
+        // it retains the listener after an app rotation.
+        dialogFragment.setOnCloseListener(new PermisoDialogFragment.IOnCloseListener() {
             @Override
-            public void onDismiss() {
+            public void onClose() {
                 rationaleCallback.onRationaleProvided();
             }
         });
@@ -135,6 +185,13 @@ public class Permiso {
     // Private
     // =====================================================================
 
+    /**
+     * Checks to see if there are any active requests that are already requesting a superset of the permissions this
+     * new request is asking for. If so, this will wire up this new request's callback to be triggered when the
+     * existing request is completed and return true. Otherwise, this does nothing and returns false.
+     * @param newRequest The new request that is about to be made.
+     * @return True if a request was linked, otherwise false.
+     */
     private boolean linkToExistingRequestIfPossible(final RequestData newRequest) {
         boolean found = false;
 
@@ -172,12 +229,20 @@ public class Permiso {
         return found;
     }
 
+    /**
+     * Puts the RequestData in the map of requests and gives back the request code.
+     * @return The request code generated for this request.
+     */
     private int markRequestAsActive(RequestData requestData) {
         int requestCode = mActiveRequestCode++;
         mCodesToRequests.put(requestCode, requestData);
         return requestCode;
     }
 
+    /**
+     * Makes the permission request for the request that matches the provided request code.
+     * @param requestCode The request code of the request you want to run.
+     */
     private void makePermissionRequest(int requestCode) {
         RequestData requestData = mCodesToRequests.get(requestCode);
         ActivityCompat.requestPermissions(mActivity, requestData.resultSet.getUngrantedPermissions(), requestCode);
@@ -209,11 +274,14 @@ public class Permiso {
 
     /**
      * Simple callback to let Permiso know that you have finished providing the user a rationale for a set of permissions.
+     * For easy handling of this callback, consider using
+     * {@link Permiso#showRationaleInDialog(String, String, String, IOnRationaleProvided)}.
      */
     public interface IOnRationaleProvided {
         /**
          * Invoke this method when you are done providing a rationale to the user in
-         * {@link IOnPermissionResult#onRationaleRequested(IOnRationaleProvided, String...)}
+         * {@link IOnPermissionResult#onRationaleRequested(IOnRationaleProvided, String...)}. The permission request
+         * will not be made until this method is invoked.
          */
         void onRationaleProvided();
     }
