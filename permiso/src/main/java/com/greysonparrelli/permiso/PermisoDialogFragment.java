@@ -62,6 +62,8 @@ public class PermisoDialogFragment extends DialogFragment {
 
     @Override
     public void onDestroyView() {
+        // If we don't do this, the DialogFragment is not recreated after a rotation. See bug:
+        // https://code.google.com/p/android/issues/detail?id=17423
         if (getDialog() != null && getRetainInstance()) {
             getDialog().setDismissMessage(null);
         }
