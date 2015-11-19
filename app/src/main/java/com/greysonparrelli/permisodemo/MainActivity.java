@@ -8,11 +8,12 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.greysonparrelli.permiso.Permiso;
+import com.greysonparrelli.permiso.PermisoActivity;
 
 /**
  * An activity that demonstrates the features of {@link Permiso}.
  */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends PermisoActivity {
 
 
     // =====================================================================
@@ -23,9 +24,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        // Register the activity in Permiso. It is crucial that you do this in every one of your activities!
-        Permiso.getInstance().setActivity(this);
 
         // Set click listeners
         findViewById(R.id.btn_single).setOnClickListener(new View.OnClickListener() {
@@ -46,14 +44,6 @@ public class MainActivity extends AppCompatActivity {
                 onDuplicateClick();
             }
         });
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        // All we do here is forward the results of the method to Permiso for processing
-        Permiso.getInstance().onRequestPermissionResult(requestCode, permissions, grantResults);
     }
 
 
