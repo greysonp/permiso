@@ -1,4 +1,4 @@
-Permiso [![Build Status](https://travis-ci.org/greysonp/permiso.svg?branch=master)](https://travis-ci.org/greysonp/permiso)
+Permiso [![Build Status](https://travis-ci.org/greysonp/permiso.svg?branch=master)](https://travis-ci.org/greysonp/permiso) [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Permiso-green.svg?style=true)](https://android-arsenal.com/details/1/2818)
 =======
 
 Permiso is an Android library that makes requesting runtime permissions a whole lot easier.
