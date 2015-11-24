@@ -8,12 +8,12 @@ ext {
     libraryName = 'Permiso'
     artifact = 'permiso'
 
-    libraryDescription = 'An Android library that makes dealing with the Android Marshmallow permission system a bit easier.'
+    libraryDescription = 'An Android library to make handling runtime permissions a whole lot easier.'
 
     siteUrl = 'https://github.com/greysonp/permiso'
     gitUrl = 'https://github.com/greysonp/permiso.git'
 
-    libraryVersion = '0.1.0'
+    libraryVersion = '0.1.1'
 
     developerId = 'greysonp'
     developerName = 'Greyson Parrelli'
@@ -45,7 +45,7 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:23.1.0'
+    compile 'com.android.support:appcompat-v7:23.1.1'
 }
 
 // Only add in the bintray stuff if we're building locally

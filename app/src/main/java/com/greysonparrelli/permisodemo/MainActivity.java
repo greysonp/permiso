@@ -1,9 +1,8 @@
 package com.greysonparrelli.permisodemo;
 
 import android.Manifest;
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Toast;
 
@@ -11,10 +10,11 @@ import com.greysonparrelli.permiso.Permiso;
 import com.greysonparrelli.permiso.PermisoActivity;
 
 /**
- * An activity that demonstrates the features of {@link Permiso}.
+ * An activity that demonstrates the features of {@link Permiso}. This activity extends {@link PermisoActivity} in order
+ * to handle some boilerplate. If you don't want to extend {@link PermisoActivity}, check out
+ * {@link NonPermisoActivity}.
  */
 public class MainActivity extends PermisoActivity {
-
 
     // =====================================================================
     // Overrides
@@ -42,6 +42,12 @@ public class MainActivity extends PermisoActivity {
             @Override
             public void onClick(View v) {
                 onDuplicateClick();
+            }
+        });
+        findViewById(R.id.btn_non_permiso).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onNonPermisoClick();
             }
         });
     }
@@ -136,5 +142,12 @@ public class MainActivity extends PermisoActivity {
                 Permiso.getInstance().showRationaleInDialog("Permission Rationale", "Needed for demo purposes.", null, callback);
             }
         }, Manifest.permission.CAMERA);
+    }
+
+    /**
+     * Starts {@link NonPermisoActivity}.
+     */
+    private void onNonPermisoClick() {
+        startActivity(new Intent(this, NonPermisoActivity.class));
     }
 }

@@ -26,4 +26,10 @@
         android:layout_height="wrap_content"
         android:text="Request Duplicate Permissions"/>
 
+    <Button
+        android:id="@+id/btn_non_permiso"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Open Non-PermisoActivity Example"/>
+
 </LinearLayout>

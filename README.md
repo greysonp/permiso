@@ -61,7 +61,7 @@ Gradle
 ------
 ```java
 dependencies {
-    compile 'com.greysonparrelli.permiso:permiso:0.1.0'
+    compile 'com.greysonparrelli.permiso:permiso:0.1.1'
 }
 ```
 
@@ -71,7 +71,7 @@ FAQ
 
 Of course not! Permiso requires very little boilerplate, and therefore ```PermisoActivity``` does very little. If you don't want to subclass ```PermisoActivity```, all you have to do is make sure you do the two following things:
 
-* In ```onCreate()```, invoke ```Permiso.getInstance().setActivity(this)```.
+* In ```onCreate()``` and ```onResume()```, invoke ```Permiso.getInstance().setActivity(this)```.
 * Forward the results of ```Activity.onRequestPermissionsResult()``` to ```Permiso.getInstance().onRequestPermissionResult()```.
 
 Here's an example:
@@ -80,6 +80,12 @@ Here's an example:
 @Override
 protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    Permiso.getInstance().setActivity(this);
+}
+
+@Override
+protected void onResume() {
+    super.onResume();
     Permiso.getInstance().setActivity(this);
 }
 
