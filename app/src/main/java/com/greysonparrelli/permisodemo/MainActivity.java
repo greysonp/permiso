@@ -76,7 +76,7 @@ public class MainActivity extends PermisoActivity {
             public void onRationaleRequested(Permiso.IOnRationaleProvided callback, String... permissions) {
                 Permiso.getInstance().showRationaleInDialog("Permission Rationale", "Needed for demo purposes.", null, callback);
             }
-        }, Manifest.permission.READ_EXTERNAL_STORAGE);
+        }, Manifest.permission.WRITE_EXTERNAL_STORAGE);
     }
 
     /**
