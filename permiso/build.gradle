@@ -13,7 +13,7 @@ ext {
     siteUrl = 'https://github.com/greysonp/permiso'
     gitUrl = 'https://github.com/greysonp/permiso.git'
 
-    libraryVersion = '0.1.1'
+    libraryVersion = '0.1.2'
 
     developerId = 'greysonp'
     developerName = 'Greyson Parrelli'
