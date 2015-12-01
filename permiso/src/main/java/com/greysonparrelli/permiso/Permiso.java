@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,6 +21,8 @@ import java.util.Map;
  * app.
  */
 public class Permiso {
+
+    private static final String TAG = "Permiso";
 
     /**
      * A map to keep track of our outstanding permission requests. The key is the request code sent when we call
@@ -152,6 +155,8 @@ public class Permiso {
             requestData.resultSet.parsePermissionResults(permissions, grantResults);
             requestData.onResultListener.onPermissionResult(requestData.resultSet);
             mCodesToRequests.remove(requestCode);
+        } else {
+            Log.w(TAG, "onRequestPermissionResult() was given an unrecognized request code.");
         }
     }
 
