@@ -10,6 +10,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -35,7 +36,7 @@ public class Permiso {
      * The active activity. Used to make permissions requests. This must be set by the library-user through
      * {@link Permiso#setActivity(Activity)} or else bad things will happen.
      */
-    private Activity mActivity;
+    private WeakReference<Activity> mActivity;
 
     /**
      * This is just a value we increment to generate new request codes for use with
@@ -81,7 +82,7 @@ public class Permiso {
      * @param activity The activity that is currently active.
      */
     public void setActivity(@NonNull Activity activity) {
-        mActivity = activity;
+        mActivity = new WeakReference<>(activity);
     }
 
     /**
@@ -95,11 +96,13 @@ public class Permiso {
      */
     @MainThread
     public void requestPermissions(@NonNull IOnPermissionResult callback, String... permissions) {
+        checkActivity();
+
         final RequestData requestData = new RequestData(callback, permissions);
 
         // Mark any permissions that are already granted
         for (String permission : permissions) {
-            if (ContextCompat.checkSelfPermission(mActivity, permission) == PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(mActivity.get(), permission) == PackageManager.PERMISSION_GRANTED) {
                 requestData.resultSet.grantPermissions(permission);
             }
         }
@@ -119,7 +122,7 @@ public class Permiso {
                 final int requestCode = markRequestAsActive(requestData);
 
                 // First check if there's any permissions for which we need to provide a rationale for using
-                String[] permissionsThatNeedRationale = requestData.resultSet.getPermissionsThatNeedRationale(mActivity);
+                String[] permissionsThatNeedRationale = requestData.resultSet.getPermissionsThatNeedRationale(mActivity.get());
 
                 // If there are some that need a rationale, show that rationale, then continue with the request
                 if (permissionsThatNeedRationale.length > 0) {
@@ -175,6 +178,8 @@ public class Permiso {
      */
     @MainThread
     public void showRationaleInDialog(@Nullable String title, @NonNull String message, @Nullable String buttonText, @NonNull final IOnRationaleProvided rationaleCallback) {
+        checkActivity();
+
         PermisoDialogFragment dialogFragment = PermisoDialogFragment.newInstance(title, message, buttonText);
 
         // We show the rationale after the dialog is closed. We use setRetainInstance(true) in the dialog to ensure that
@@ -185,7 +190,7 @@ public class Permiso {
                 rationaleCallback.onRationaleProvided();
             }
         });
-        dialogFragment.show(mActivity.getFragmentManager(), PermisoDialogFragment.TAG);
+        dialogFragment.show(mActivity.get().getFragmentManager(), PermisoDialogFragment.TAG);
     }
 
 
@@ -253,7 +258,17 @@ public class Permiso {
      */
     private void makePermissionRequest(int requestCode) {
         RequestData requestData = mCodesToRequests.get(requestCode);
-        ActivityCompat.requestPermissions(mActivity, requestData.resultSet.getUngrantedPermissions(), requestCode);
+        ActivityCompat.requestPermissions(mActivity.get(), requestData.resultSet.getUngrantedPermissions(), requestCode);
+    }
+
+    /**
+     * Ensures that our WeakReference to the Activity is still valid. If it isn't, throw an exception saying that the
+     * Activity needs to be set.
+     */
+    private void checkActivity() {
+        if (mActivity.get() == null) {
+            throw new IllegalStateException("No activity set. Either subclass PermisoActivity or call Permiso.setActivity() in onCreate() and onResume() of your Activity.");
+        }
     }
 
 
