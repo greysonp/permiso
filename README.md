@@ -61,7 +61,7 @@ Gradle
 ------
 ```java
 dependencies {
-    compile 'com.greysonparrelli.permiso:permiso:0.1.2'
+    compile 'com.greysonparrelli.permiso:permiso:0.1.3'
 }
 ```
 
