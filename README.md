@@ -61,7 +61,7 @@ Gradle
 ------
 ```java
 dependencies {
-    compile 'com.greysonparrelli.permiso:permiso:0.1.3'
+    compile 'com.greysonparrelli.permiso:permiso:0.2.0'
 }
 ```
 
@@ -109,7 +109,7 @@ public void onRationaleRequested(Permiso.IOnRationaleProvided callback, String..
 
 **I want to do some complicated logic with the results of my permission request, but the ResultSet doesn't let me.**
 
-Fear not! The ```ResultSet``` object has a method called ```toMap()```, which will give you back a mapping of permissions -> booleans that you can iterate over to your heart's content.
+Fear not! The ```ResultSet``` object has a method called ```toMap()```, which will give you back a mapping of permissions -> ```Permiso.Result``` that you can iterate over to your heart's content.
 
 **What do you mean when you say that Permiso merges simultaneous requests for the same permission into a single request?**
 
