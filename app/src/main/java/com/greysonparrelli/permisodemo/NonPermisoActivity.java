@@ -59,8 +59,10 @@ public class NonPermisoActivity extends AppCompatActivity {
         Permiso.getInstance().requestPermissions(new Permiso.IOnPermissionResult() {
             @Override
             public void onPermissionResult(Permiso.ResultSet resultSet) {
-                if (resultSet.areAllPermissionsGranted()) {
+                if (resultSet.isPermissionGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                     Toast.makeText(NonPermisoActivity.this, "Permission Granted!", Toast.LENGTH_SHORT).show();
+                } else if (resultSet.isPermissionPermanentlyDenied(Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+                    Toast.makeText(NonPermisoActivity.this, "Permission Permanently Denied.", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(NonPermisoActivity.this, "Permission Denied.", Toast.LENGTH_SHORT).show();
                 }

@@ -155,7 +155,7 @@ public class Permiso {
     public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) {
         if (mCodesToRequests.containsKey(requestCode)) {
             RequestData requestData = mCodesToRequests.get(requestCode);
-            requestData.resultSet.parsePermissionResults(permissions, grantResults);
+            requestData.resultSet.parsePermissionResults(permissions, grantResults, mActivity.get());
             requestData.onResultListener.onPermissionResult(requestData.resultSet);
             mCodesToRequests.remove(requestCode);
         } else {
@@ -223,7 +223,7 @@ public class Permiso {
                         // Next, copy over the results to the new one's resultSet
                         String[] unsatisfied = newRequest.resultSet.getUngrantedPermissions();
                         for (String permission : unsatisfied) {
-                            newRequest.resultSet.requestResults.put(permission, resultSet.isPermissionGranted(permission));
+                            newRequest.resultSet.requestResults.put(permission, resultSet.requestResults.get(permission));
                         }
 
                         // Finally, trigger the new one's callback
@@ -324,12 +324,12 @@ public class Permiso {
      */
     public static class ResultSet {
 
-        private Map<String, Boolean> requestResults;
+        private Map<String, Result> requestResults;
 
         private ResultSet(String... permissions) {
             requestResults = new HashMap<>(permissions.length);
             for (String permission : permissions) {
-                requestResults.put(permission, false);
+                requestResults.put(permission, Result.DENIED);
             }
         }
 
@@ -339,10 +339,7 @@ public class Permiso {
          * @return True if the permission was granted, otherwise false.
          */
         public boolean isPermissionGranted(String permission) {
-            if (requestResults.containsKey(permission)) {
-                return requestResults.get(permission);
-            }
-            return false;
+            return requestResults.containsKey(permission) && requestResults.get(permission) == Result.GRANTED;
         }
 
         /**
@@ -350,36 +347,51 @@ public class Permiso {
          * @return True if all permissions in the request were granted, otherwise false.
          */
         public boolean areAllPermissionsGranted() {
-            return !requestResults.containsValue(false);
+            return !requestResults.containsValue(Result.DENIED) && !requestResults.containsValue(Result.PERMANENTLY_DENIED);
+        }
+
+        /**
+         * Checks if a permission was permanently denied by the user (i.e. they denied and selected "Dont Ask Again".)
+         * @param permission The permission you are inquiring about. This should be a constant from {@link android.Manifest.permission}.
+         * @return True if the permission was permanently denied, otherwise false.
+         */
+        public boolean isPermissionPermanentlyDenied(String permission) {
+            return requestResults.containsKey(permission) && requestResults.get(permission) == Result.PERMANENTLY_DENIED;
         }
 
         /**
          * Returns a map representation of this result set. Useful if you'd like to do more complicated operations
          * with the results.
          * @return
-         *      A mapping of permission constants to booleans, where true indicates that the permission was granted,
-         *      and false indicates that the permission was denied.
+         *      A mapping of permission constants to {@link Result}.
          */
-        public Map<String, Boolean> toMap() {
+        public Map<String, Result> toMap() {
             return new HashMap<>(requestResults);
         }
 
         private void grantPermissions(String... permissions) {
             for (String permission : permissions) {
-                requestResults.put(permission, true);
+                requestResults.put(permission, Result.GRANTED);
             }
         }
 
-        private void parsePermissionResults(String[] permissions, int[] grantResults) {
+        private void parsePermissionResults(String[] permissions, int[] grantResults, Activity activity) {
             for (int i = 0; i < permissions.length; i++) {
-                requestResults.put(permissions[i], grantResults[i] == PackageManager.PERMISSION_GRANTED);
+                if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                    requestResults.put(permissions[i], Result.GRANTED);
+                } else if (!ActivityCompat.shouldShowRequestPermissionRationale(activity, permissions[i])) {
+                    requestResults.put(permissions[i], Result.PERMANENTLY_DENIED);
+                } else {
+                    requestResults.put(permissions[i], Result.DENIED);
+                }
             }
         }
 
         private String[] getUngrantedPermissions() {
             List<String> ungrantedList = new ArrayList<>(requestResults.size());
             for (String permission : requestResults.keySet()) {
-                if (!requestResults.get(permission)) {
+                Result result = requestResults.get(permission);
+                if (result == Result.DENIED || result == Result.PERMANENTLY_DENIED) {
                     ungrantedList.add(permission);
                 }
             }
@@ -401,5 +413,25 @@ public class Permiso {
             }
             return shouldShowRationale.toArray(new String[shouldShowRationale.size()]);
         }
+    }
+
+    /**
+     * Describes the result of a permission request.
+     */
+    public enum Result {
+        /**
+         * The permission was granted.
+         */
+        GRANTED,
+
+        /**
+         * The permission was denied, but not permanently.
+         */
+        DENIED,
+
+        /**
+         * The permission was permanently denied.
+         */
+        PERMANENTLY_DENIED
     }
 }

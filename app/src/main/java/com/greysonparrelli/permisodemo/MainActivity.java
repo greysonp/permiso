@@ -65,8 +65,10 @@ public class MainActivity extends PermisoActivity {
         Permiso.getInstance().requestPermissions(new Permiso.IOnPermissionResult() {
             @Override
             public void onPermissionResult(Permiso.ResultSet resultSet) {
-                if (resultSet.areAllPermissionsGranted()) {
+                if (resultSet.isPermissionGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                     Toast.makeText(MainActivity.this, "Permission Granted!", Toast.LENGTH_SHORT).show();
+                } else if (resultSet.isPermissionPermanentlyDenied(Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+                    Toast.makeText(MainActivity.this, "Permission Permanently Denied.", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(MainActivity.this, "Permission Denied.", Toast.LENGTH_SHORT).show();
                 }
