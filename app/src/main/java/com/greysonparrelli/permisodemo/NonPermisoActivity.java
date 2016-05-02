@@ -60,17 +60,17 @@ public class NonPermisoActivity extends AppCompatActivity {
             @Override
             public void onPermissionResult(Permiso.ResultSet resultSet) {
                 if (resultSet.isPermissionGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                    Toast.makeText(NonPermisoActivity.this, "Permission Granted!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(NonPermisoActivity.this, R.string.permission_granted, Toast.LENGTH_SHORT).show();
                 } else if (resultSet.isPermissionPermanentlyDenied(Manifest.permission.WRITE_EXTERNAL_STORAGE)){
-                    Toast.makeText(NonPermisoActivity.this, "Permission Permanently Denied.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(NonPermisoActivity.this, R.string.permission_permanently_denied, Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(NonPermisoActivity.this, "Permission Denied.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(NonPermisoActivity.this, R.string.permission_denied, Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onRationaleRequested(Permiso.IOnRationaleProvided callback, String... permissions) {
-                Permiso.getInstance().showRationaleInDialog("Permission Rationale", "Needed for demo purposes.", null, callback);
+                Permiso.getInstance().showRationaleInDialog(getString(R.string.permission_rationale), getString(R.string.needed_for_demo_purposes), null, callback);
             }
         }, Manifest.permission.WRITE_EXTERNAL_STORAGE);
     }

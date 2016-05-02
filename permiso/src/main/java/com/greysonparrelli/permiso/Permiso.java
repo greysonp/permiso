@@ -389,10 +389,10 @@ public class Permiso {
 
         private String[] getUngrantedPermissions() {
             List<String> ungrantedList = new ArrayList<>(requestResults.size());
-            for (String permission : requestResults.keySet()) {
-                Result result = requestResults.get(permission);
+            for (Map.Entry<String, Result> requestResultsEntry : requestResults.entrySet()) {
+                Result result = requestResultsEntry.getValue();
                 if (result == Result.DENIED || result == Result.PERMANENTLY_DENIED) {
-                    ungrantedList.add(permission);
+                    ungrantedList.add(requestResultsEntry.getKey());
                 }
             }
             return ungrantedList.toArray(new String[ungrantedList.size()]);

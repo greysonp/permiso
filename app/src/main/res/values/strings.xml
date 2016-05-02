@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">Permiso Demo</string>
     <string name="action_settings">Settings</string>
+    <string name="permission_rationale">Permission Rationale</string>
+    <string name="needed_for_demo_purposes">Needed for demo purposes.</string>
+    <string name="permission_granted">Permission Granted!</string>
+    <string name="permission_permanently_denied">Permission Permanently Denied.</string>
+    <string name="permission_denied">Permission Denied.</string>
+    <string name="two_permission_granted">2 Permissions Granted.</string>
 </resources>

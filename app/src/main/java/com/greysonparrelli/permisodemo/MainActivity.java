@@ -66,17 +66,17 @@ public class MainActivity extends PermisoActivity {
             @Override
             public void onPermissionResult(Permiso.ResultSet resultSet) {
                 if (resultSet.isPermissionGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                    Toast.makeText(MainActivity.this, "Permission Granted!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, R.string.permission_granted, Toast.LENGTH_SHORT).show();
                 } else if (resultSet.isPermissionPermanentlyDenied(Manifest.permission.WRITE_EXTERNAL_STORAGE)){
-                    Toast.makeText(MainActivity.this, "Permission Permanently Denied.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, R.string.permission_permanently_denied, Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(MainActivity.this, "Permission Denied.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, R.string.permission_denied, Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onRationaleRequested(Permiso.IOnRationaleProvided callback, String... permissions) {
-                Permiso.getInstance().showRationaleInDialog("Permission Rationale", "Needed for demo purposes.", null, callback);
+                Permiso.getInstance().showRationaleInDialog(getString(R.string.permission_rationale), getString(R.string.needed_for_demo_purposes), null, callback);
             }
         }, Manifest.permission.WRITE_EXTERNAL_STORAGE);
     }
@@ -96,12 +96,12 @@ public class MainActivity extends PermisoActivity {
                 if (resultSet.isPermissionGranted(Manifest.permission.READ_CALENDAR)) {
                     numGranted++;
                 }
-                Toast.makeText(MainActivity.this, numGranted + "/2 Permissions Granted.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, numGranted + R.string.two_permission_granted, Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onRationaleRequested(Permiso.IOnRationaleProvided callback, String... permissions) {
-                Permiso.getInstance().showRationaleInDialog("Permission Rationale", "Needed for demo purposes.", null, callback);
+                Permiso.getInstance().showRationaleInDialog(getString(R.string.permission_rationale), getString(R.string.needed_for_demo_purposes), null, callback);
             }
         }, Manifest.permission.READ_CONTACTS, Manifest.permission.READ_CALENDAR);
     }
@@ -112,36 +112,26 @@ public class MainActivity extends PermisoActivity {
      */
     private void onDuplicateClick() {
         // First request
-        Permiso.getInstance().requestPermissions(new Permiso.IOnPermissionResult() {
-            @Override
-            public void onPermissionResult(Permiso.ResultSet resultSet) {
-                if (resultSet.areAllPermissionsGranted()) {
-                    Toast.makeText(MainActivity.this, "Permission Granted! (1)", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(MainActivity.this, "Permission Denied. (1)", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onRationaleRequested(Permiso.IOnRationaleProvided callback, String... permissions) {
-                Permiso.getInstance().showRationaleInDialog("Permission Rationale", "Needed for demo purposes.", null, callback);
-            }
-        }, Manifest.permission.CAMERA);
+        requestPermissions("1");
 
         // Second request for the same permission
+        requestPermissions("2");
+    }
+
+    private void requestPermissions(final String requestNumber) {
         Permiso.getInstance().requestPermissions(new Permiso.IOnPermissionResult() {
             @Override
             public void onPermissionResult(Permiso.ResultSet resultSet) {
                 if (resultSet.areAllPermissionsGranted()) {
-                    Toast.makeText(MainActivity.this, "Permission Granted! (2)", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, R.string.permission_granted + " (" + requestNumber + ")", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(MainActivity.this, "Permission Denied. (2)", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, R.string.permission_denied + " (" + requestNumber + ")", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onRationaleRequested(Permiso.IOnRationaleProvided callback, String... permissions) {
-                Permiso.getInstance().showRationaleInDialog("Permission Rationale", "Needed for demo purposes.", null, callback);
+                Permiso.getInstance().showRationaleInDialog(getString(R.string.permission_rationale), getString(R.string.needed_for_demo_purposes), null, callback);
             }
         }, Manifest.permission.CAMERA);
     }
