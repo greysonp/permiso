@@ -15,7 +15,7 @@ import android.support.v7.app.AlertDialog;
  */
 public class PermisoDialogFragment extends DialogFragment {
 
-    public static String TAG = "PermisoDialogFragment";
+    public static final String TAG = "PermisoDialogFragment";
 
     private static final String KEY_TITLE = "title";
     private static final String KEY_MESSAGE = "message";
