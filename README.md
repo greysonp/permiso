@@ -114,3 +114,7 @@ Fear not! The ```ResultSet``` object has a method called ```toMap()```, which wi
 **What do you mean when you say that Permiso merges simultaneous requests for the same permission into a single request?**
 
 If you request the same permission in two places simultaneously, Permiso will automatically merge them into one request. You might think this is a rare scenario, but before you know it, you have master and detail fragments that both need access to the user's contacts, and now you have to manage your permissions so their simultaneous requests don't cause two separate pop-ups! Don't worry, Permiso handles this for you.
+
+**I request a permission but nothing happens? What's up?**
+
+Did you make sure to declare your permissions in your ```AndroidManifest.xml```? If you don't, permission requests fail silently. That's an Android thing - not much Permiso can do there.
