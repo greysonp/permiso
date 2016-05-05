@@ -1,6 +1,7 @@
 package com.greysonparrelli.permiso;
 
 import android.app.Activity;
+import android.app.FragmentManager;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.MainThread;
@@ -181,7 +182,15 @@ public class Permiso {
     public void showRationaleInDialog(@Nullable String title, @NonNull String message, @Nullable String buttonText, @NonNull final IOnRationaleProvided rationaleCallback) {
         Activity activity = checkActivity();
 
-        PermisoDialogFragment dialogFragment = PermisoDialogFragment.newInstance(title, message, buttonText);
+        FragmentManager fm = activity.getFragmentManager();
+
+        PermisoDialogFragment dialogFragment = (PermisoDialogFragment) fm.findFragmentByTag(PermisoDialogFragment.TAG);
+        if (dialogFragment != null)
+        {
+            dialogFragment.dismiss();
+        }
+
+        dialogFragment = PermisoDialogFragment.newInstance(title, message, buttonText);
 
         // We show the rationale after the dialog is closed. We use setRetainInstance(true) in the dialog to ensure that
         // it retains the listener after an app rotation.
