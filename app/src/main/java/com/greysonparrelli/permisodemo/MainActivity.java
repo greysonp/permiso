@@ -96,7 +96,8 @@ public class MainActivity extends PermisoActivity {
                 if (resultSet.isPermissionGranted(Manifest.permission.READ_CALENDAR)) {
                     numGranted++;
                 }
-                Toast.makeText(MainActivity.this, numGranted + R.string.two_permission_granted, Toast.LENGTH_SHORT).show();
+                String message = getString(R.string.X_permissions_granted, numGranted);
+                Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
             }
 
             @Override
