@@ -2,10 +2,9 @@ package com.greysonparrelli.permiso;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
 
 /**
  * An Activity that handles the small amount of boilerplate that {@link Permiso} requires to run. If you'd rather not
@@ -33,13 +32,6 @@ public class PermisoActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(final int requestCode, @NonNull final String[] permissions, @NonNull final int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        // If we don't do this, android.support.v4.app.DialogFragment can throw IllegalStateException. See bug:
-        // https://code.google.com/p/android/issues/detail?id=190966
-        new Handler().post(new Runnable() {
-            @Override
-            public void run() {
-                Permiso.getInstance().onRequestPermissionResult(requestCode, permissions, grantResults);
-            }
-        });
+        Permiso.getInstance().onRequestPermissionResult(requestCode, permissions, grantResults);
     }
 }

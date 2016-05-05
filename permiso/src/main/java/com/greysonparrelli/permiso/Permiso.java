@@ -3,6 +3,7 @@ package com.greysonparrelli.permiso;
 import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -154,16 +155,23 @@ public class Permiso {
      *      The grant results given to you by {@link Activity#onRequestPermissionsResult(int, String[], int[])}.
      */
     @MainThread
-    public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) {
-        FragmentActivity activity = checkActivity();
-        if (mCodesToRequests.containsKey(requestCode)) {
-            RequestData requestData = mCodesToRequests.get(requestCode);
-            requestData.resultSet.parsePermissionResults(permissions, grantResults, activity);
-            requestData.onResultListener.onPermissionResult(requestData.resultSet);
-            mCodesToRequests.remove(requestCode);
-        } else {
-            Log.w(TAG, "onRequestPermissionResult() was given an unrecognized request code.");
-        }
+    public void onRequestPermissionResult(final int requestCode, final String[] permissions, final int[] grantResults) {
+        // If we don't do this, android.support.v4.app.DialogFragment will throw IllegalStateException. See bug:
+        // https://code.google.com/p/android/issues/detail?id=190966
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
+                FragmentActivity activity = checkActivity();
+                if (mCodesToRequests.containsKey(requestCode)) {
+                    RequestData requestData = mCodesToRequests.get(requestCode);
+                    requestData.resultSet.parsePermissionResults(permissions, grantResults, activity);
+                    requestData.onResultListener.onPermissionResult(requestData.resultSet);
+                    mCodesToRequests.remove(requestCode);
+                } else {
+                    Log.w(TAG, "onRequestPermissionResult() was given an unrecognized request code.");
+                }
+            }
+        });
     }
 
     /**
