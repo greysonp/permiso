@@ -1,13 +1,14 @@
 package com.greysonparrelli.permiso;
 
 import android.app.Activity;
-import android.app.FragmentManager;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
@@ -35,9 +36,9 @@ public class Permiso {
 
     /**
      * The active activity. Used to make permissions requests. This must be set by the library-user through
-     * {@link Permiso#setActivity(Activity)} or else bad things will happen.
+     * {@link Permiso#setActivity(FragmentActivity)} or else bad things will happen.
      */
-    private WeakReference<Activity> mActivity;
+    private WeakReference<FragmentActivity> mActivity;
 
     /**
      * This is just a value we increment to generate new request codes for use with
@@ -82,13 +83,13 @@ public class Permiso {
      * <strong>Important: </strong> If your activity subclasses {@link PermisoActivity}, this is already handled for you.
      * @param activity The activity that is currently active.
      */
-    public void setActivity(@NonNull Activity activity) {
+    public void setActivity(@NonNull FragmentActivity activity) {
         mActivity = new WeakReference<>(activity);
     }
 
     /**
      * Request one or more permissions from the system. Make sure that you are either subclassing {@link PermisoActivity}
-     * or that you have set your current activity using {@link Permiso#setActivity(Activity)}!
+     * or that you have set your current activity using {@link Permiso#setActivity(FragmentActivity)}!
      * @param callback
      *      A callback that will be triggered when the results of your permission request are available.
      * @param permissions
@@ -97,7 +98,7 @@ public class Permiso {
      */
     @MainThread
     public void requestPermissions(@NonNull IOnPermissionResult callback, String... permissions) {
-        Activity activity = checkActivity();
+        FragmentActivity activity = checkActivity();
 
         final RequestData requestData = new RequestData(callback, permissions);
 
@@ -154,7 +155,7 @@ public class Permiso {
      */
     @MainThread
     public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) {
-        Activity activity = checkActivity();
+        FragmentActivity activity = checkActivity();
         if (mCodesToRequests.containsKey(requestCode)) {
             RequestData requestData = mCodesToRequests.get(requestCode);
             requestData.resultSet.parsePermissionResults(permissions, grantResults, activity);
@@ -180,9 +181,9 @@ public class Permiso {
      */
     @MainThread
     public void showRationaleInDialog(@Nullable String title, @NonNull String message, @Nullable String buttonText, @NonNull final IOnRationaleProvided rationaleCallback) {
-        Activity activity = checkActivity();
+        FragmentActivity activity = checkActivity();
 
-        FragmentManager fm = activity.getFragmentManager();
+        FragmentManager fm = activity.getSupportFragmentManager();
 
         PermisoDialogFragment dialogFragment = (PermisoDialogFragment) fm.findFragmentByTag(PermisoDialogFragment.TAG);
         if (dialogFragment != null)
@@ -267,7 +268,7 @@ public class Permiso {
      * @param requestCode The request code of the request you want to run.
      */
     private void makePermissionRequest(int requestCode) {
-        Activity activity = checkActivity();
+        FragmentActivity activity = checkActivity();
         RequestData requestData = mCodesToRequests.get(requestCode);
         ActivityCompat.requestPermissions(activity, requestData.resultSet.getUngrantedPermissions(), requestCode);
     }
@@ -276,8 +277,8 @@ public class Permiso {
      * Ensures that our WeakReference to the Activity is still valid. If it isn't, throw an exception saying that the
      * Activity needs to be set.
      */
-    private Activity checkActivity() {
-        Activity activity = mActivity.get();
+    private FragmentActivity checkActivity() {
+        FragmentActivity activity = mActivity.get();
         if (activity == null) {
             throw new IllegalStateException("No activity set. Either subclass PermisoActivity or call Permiso.setActivity() in onCreate() and onResume() of your Activity.");
         }
