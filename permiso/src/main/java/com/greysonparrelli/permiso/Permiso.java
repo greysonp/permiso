@@ -200,7 +200,7 @@ public class Permiso {
                 rationaleCallback.onRationaleProvided();
             }
         });
-        dialogFragment.show(activity.getFragmentManager(), PermisoDialogFragment.TAG);
+        dialogFragment.show(fm, PermisoDialogFragment.TAG);
     }
 
 
