@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import com.greysonparrelli.permiso.Permiso;
 import com.greysonparrelli.permiso.PermisoActivity;
+import com.greysonparrelli.permiso.PermisoDialogFragment;
 
 /**
  * An activity that demonstrates the features of {@link Permiso}. This activity extends {@link PermisoActivity} in order
@@ -76,7 +77,11 @@ public class MainActivity extends PermisoActivity {
 
             @Override
             public void onRationaleRequested(Permiso.IOnRationaleProvided callback, String... permissions) {
-                Permiso.getInstance().showRationaleInDialog(getString(R.string.permission_rationale), getString(R.string.needed_for_demo_purposes), null, callback);
+                PermisoDialogFragment.Builder builder = new PermisoDialogFragment.Builder(R.string.permission_rationale,
+                                                                                        R.string.needed_for_html_demo_purposes,
+                                                                                        android.R.string.ok);
+                builder.setHtmlInterpretation(true);
+                Permiso.getInstance().showRationaleInDialog(builder, callback);
             }
         }, Manifest.permission.WRITE_EXTERNAL_STORAGE);
     }
