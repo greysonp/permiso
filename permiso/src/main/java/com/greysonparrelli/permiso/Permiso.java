@@ -197,12 +197,8 @@ public class Permiso {
      * A helper to show your rationale in a {@link android.app.DialogFragment} when implementing
      * {@link IOnRationaleProvided#onRationaleProvided()}. Automatically invokes the rationale callback when the user
      * dismisses the dialog.
-     * @param title
-     *      The title of the dialog. If null, there will be no title.
-     * @param message
-     *      The message displayed in the dialog.
-     * @param buttonText
-     *      The text you want the dismissal button to show. If null, defaults to {@link android.R.string#ok}.
+     * @param builder
+     *      A reference to PermisoDialogFragment.Builder containing parameters for displaying the Dialog.
      * @param rationaleCallback
      *      The callback to be trigger
      */
