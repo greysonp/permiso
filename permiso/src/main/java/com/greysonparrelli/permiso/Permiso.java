@@ -178,19 +178,10 @@ public class Permiso {
      */
     @MainThread
     public void showRationaleInDialog(@Nullable String title, @NonNull String message, @Nullable String buttonText, @NonNull final IOnRationaleProvided rationaleCallback) {
-        checkActivity();
-
-        PermisoDialogFragment dialogFragment = PermisoDialogFragment.newInstance(title, message, buttonText);
-
-        // We show the rationale after the dialog is closed. We use setRetainInstance(true) in the dialog to ensure that
-        // it retains the listener after an app rotation.
-        dialogFragment.setOnCloseListener(new PermisoDialogFragment.IOnCloseListener() {
-            @Override
-            public void onClose() {
-                rationaleCallback.onRationaleProvided();
-            }
-        });
-        dialogFragment.show(mActivity.get().getFragmentManager(), PermisoDialogFragment.TAG);
+        PermisoDialogFragment.Builder builder = new PermisoDialogFragment.Builder().setTitle(title)
+                                                                                .setMessage(message)
+                                                                                .setButtonText(buttonText);
+        showRationaleInDialog(builder, rationaleCallback);
     }
 
     /**
@@ -203,10 +194,10 @@ public class Permiso {
      *      The callback to be trigger
      */
     @MainThread
-    public void showRationaleInDialog(PermisoDialogFragment.Builder builder, final IOnRationaleProvided rationaleCallback) {
+    public void showRationaleInDialog(final PermisoDialogFragment.Builder builder, final IOnRationaleProvided rationaleCallback) {
         checkActivity();
 
-        PermisoDialogFragment dialogFragment = builder.build();
+        PermisoDialogFragment dialogFragment = builder.build(mActivity.get());
 
         // We show the rationale after the dialog is closed. We use setRetainInstance(true) in the dialog to ensure that
         // it retains the listener after an app rotation.

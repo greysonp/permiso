@@ -2,6 +2,7 @@ package com.greysonparrelli.permiso;
 
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -20,13 +21,10 @@ public class PermisoDialogFragment extends DialogFragment {
 
     public static final String TAG = "PermisoDialogFragment";
 
-    private static final String KEY_TITLE       = "titleId";
-    private static final String KEY_MESSAGE     = "message";
+    private static final String KEY_TITLE = "title";
+    private static final String KEY_MESSAGE = "message";
     private static final String KEY_BUTTON_TEXT = "button_text";
-    private static final String KEY_MESSAGE_ID  = "message_id";
-    private static final String KEY_TITLE_ID    = "title_id";
-    private static final String KEY_HAS_HTML    = "has_html";
-    private static final String KEY_BUTTON_TEXT_ID = "button_text_id";
+    private static final String KEY_HAS_HTML = "has_html";
 
     private String mTitle;
     private String mMessage;
@@ -43,63 +41,13 @@ public class PermisoDialogFragment extends DialogFragment {
      * @return A new {@link PermisoDialogFragment}.
      */
     public static PermisoDialogFragment newInstance(@Nullable String title, @NonNull String message, @Nullable String buttonText) {
-        PermisoDialogFragment dialogFragment = new PermisoDialogFragment();
-
-        // Build arguments bundle
-        Bundle args = new Bundle();
-        args.putString(KEY_TITLE, title);
-        args.putString(KEY_MESSAGE, message);
-        args.putString(KEY_BUTTON_TEXT, buttonText);
-        dialogFragment.setArguments(args);
-
-        return dialogFragment;
+        return newInstance(new Builder()
+                        .setTitle(title)
+                        .setMessage(message)
+                        .setButtonText(buttonText));
     }
 
-    public static class Builder {
-        private int titleId = 0;
-        private String title = null;
-        private int buttonTextId = 0;
-        private String message = null;
-        private int messageId = 0;
-        // by default, interpret the dialog msg body as string text
-        private boolean interpretHtml = false;
-        private String buttonText = null;
-
-
-        private Builder() {}
-
-        public Builder(int titleId, int msgBody, int buttonTextId) {
-            this();
-            this.titleId = titleId;
-            this.messageId = msgBody;
-            this.buttonTextId = buttonTextId;
-        }
-
-
-        public int getTitleId() { return titleId; }
-        public String getTitle() { return title; }
-        public String getMessage() { return message; }
-        public int getMessageId() { return messageId;}
-        public int getButtonTextId() { return buttonTextId; }
-        public String getButtonText() { return buttonText; }
-        public boolean isHtml() { return interpretHtml; }
-
-        public Builder setTitleId(int val) { titleId = val; return this; }
-        public Builder setTitle(String val) { title = val; return this; }
-        public Builder setMessageId(String val) { message = val; return this; }
-        public Builder setMessage(int val)    { messageId = val; return this; }
-        public Builder setButtonTextId(int stringId) { buttonTextId = stringId; return this; }
-        public Builder setButtonText(String string) { buttonText = string; return this; }
-        public Builder setHtmlInterpretation(boolean interpretHtml) { this.interpretHtml = interpretHtml; return this; }
-
-
-        public PermisoDialogFragment build() {
-            return PermisoDialogFragment.getInstance(this);
-        }
-
-    }
-
-    private static PermisoDialogFragment getInstance(Builder builder) {
+    private static PermisoDialogFragment newInstance(Builder builder) {
         PermisoDialogFragment frag = new PermisoDialogFragment();
         frag.setArguments(getDialogArgs(builder));
         return frag;
@@ -110,19 +58,13 @@ public class PermisoDialogFragment extends DialogFragment {
         args.putBoolean(KEY_HAS_HTML, builder.isHtml());
         if (builder.getMessage() != null) {
             args.putString(KEY_MESSAGE, builder.getMessage());
-        } else if (builder.getMessageId() != 0) {
-            args.putInt(KEY_MESSAGE_ID, builder.getMessageId());
         }
 
         if (builder.getTitle() != null) {
             args.putString(KEY_TITLE, builder.getTitle());
-        } else if (builder.getTitleId() != 0) {
-            args.putInt(KEY_TITLE_ID, builder.getTitleId());
         }
 
-        if (builder.getButtonTextId() != 0) {
-            args.putInt(KEY_BUTTON_TEXT_ID, builder.getButtonTextId());
-        } else if (builder.getButtonText() != null) {
+        if (builder.getButtonText() != null) {
             args.putString(KEY_BUTTON_TEXT, builder.getButtonText());
         }
 
@@ -136,19 +78,13 @@ public class PermisoDialogFragment extends DialogFragment {
         // Retain instance state so we can keep our listeners registered after a rotation
         setRetainInstance(true);
 
-        if (getArguments().containsKey(KEY_TITLE_ID)) {
-            mTitle = getActivity().getString(getArguments().getInt(KEY_TITLE_ID));
-        } else if (getArguments().containsKey(KEY_TITLE)) {
+        if (getArguments().containsKey(KEY_TITLE)) {
             mTitle = getArguments().getString(KEY_TITLE);
         }
-        if (getArguments().containsKey(KEY_MESSAGE_ID)) {
-            mMessage = getActivity().getString(getArguments().getInt(KEY_MESSAGE_ID));
-        } else if (getArguments().containsKey(KEY_MESSAGE)) {
+        if (getArguments().containsKey(KEY_MESSAGE)) {
             mMessage = getArguments().getString(KEY_MESSAGE);
         }
-        if (getArguments().containsKey(KEY_BUTTON_TEXT_ID)) {
-            mButtonText = getActivity().getString(getArguments().getInt(KEY_BUTTON_TEXT_ID));
-        } else if (getArguments().containsKey(KEY_BUTTON_TEXT)) {
+        if (getArguments().containsKey(KEY_BUTTON_TEXT)) {
             mButtonText = getArguments().getString(KEY_BUTTON_TEXT);
         }
     }
@@ -173,7 +109,7 @@ public class PermisoDialogFragment extends DialogFragment {
         }
 
         // Message
-        if (getArguments().containsKey(KEY_HAS_HTML) && getArguments().getBoolean(KEY_HAS_HTML)) {
+        if (getArguments().getBoolean(KEY_HAS_HTML)) {
             TextView msg = new TextView(getActivity());
             msg.setText(Html.fromHtml(mMessage));
             msg.setMovementMethod(LinkMovementMethod.getInstance());
@@ -226,5 +162,48 @@ public class PermisoDialogFragment extends DialogFragment {
          * clicking in the area outside of the dialog. NOT triggered by rotation.
          */
         void onClose();
+    }
+
+    public static class Builder {
+        private int titleId = 0;
+        private String title = null;
+        private int buttonTextId = 0;
+        private String message = null;
+        private int messageId = 0;
+        // by default, interpret the dialog msg body as string text
+        private boolean interpretHtml = false;
+        private String buttonText = null;
+
+
+        public Builder() {}
+
+        public Builder(int titleId, int msgBody, int buttonTextId) {
+            this();
+            this.titleId = titleId;
+            this.messageId = msgBody;
+            this.buttonTextId = buttonTextId;
+        }
+
+
+        public String getTitle() { return title; }
+        public String getMessage() { return message; }
+        public String getButtonText() { return buttonText; }
+        public boolean isHtml() { return interpretHtml; }
+
+        public Builder setTitle(int val) { titleId = val; return this; }
+        public Builder setTitle(String val) { title = val; return this; }
+        public Builder setMessage(String val) { message = val; return this; }
+        public Builder setMessage(int val)    { messageId = val; return this; }
+        public Builder setButtonText(int stringId) { buttonTextId = stringId; return this; }
+        public Builder setButtonText(String string) { buttonText = string; return this; }
+        public Builder setHtmlInterpretation(boolean interpretHtml) { this.interpretHtml = interpretHtml; return this; }
+
+
+        public PermisoDialogFragment build(Context context) {
+            if (titleId > 0) { title = context.getString(titleId); }
+            if (messageId > 0) { message = context.getString(messageId); }
+            if (buttonTextId > 0) { buttonText = context.getString(buttonTextId); }
+            return PermisoDialogFragment.newInstance(this);
+        }
     }
 }
