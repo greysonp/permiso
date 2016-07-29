@@ -185,8 +185,7 @@ public class Permiso {
         FragmentManager fm = activity.getFragmentManager();
 
         PermisoDialogFragment dialogFragment = (PermisoDialogFragment) fm.findFragmentByTag(PermisoDialogFragment.TAG);
-        if (dialogFragment != null)
-        {
+        if (dialogFragment != null) {
             dialogFragment.dismiss();
         }
 
