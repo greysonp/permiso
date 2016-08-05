@@ -1,6 +1,7 @@
 package com.greysonparrelli.permiso;
 
 import android.app.Activity;
+import android.app.FragmentManager;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.MainThread;
@@ -96,13 +97,13 @@ public class Permiso {
      */
     @MainThread
     public void requestPermissions(@NonNull IOnPermissionResult callback, String... permissions) {
-        checkActivity();
+        Activity activity = checkActivity();
 
         final RequestData requestData = new RequestData(callback, permissions);
 
         // Mark any permissions that are already granted
         for (String permission : permissions) {
-            if (ContextCompat.checkSelfPermission(mActivity.get(), permission) == PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(activity, permission) == PackageManager.PERMISSION_GRANTED) {
                 requestData.resultSet.grantPermissions(permission);
             }
         }
@@ -122,7 +123,7 @@ public class Permiso {
                 final int requestCode = markRequestAsActive(requestData);
 
                 // First check if there's any permissions for which we need to provide a rationale for using
-                String[] permissionsThatNeedRationale = requestData.resultSet.getPermissionsThatNeedRationale(mActivity.get());
+                String[] permissionsThatNeedRationale = requestData.resultSet.getPermissionsThatNeedRationale(activity);
 
                 // If there are some that need a rationale, show that rationale, then continue with the request
                 if (permissionsThatNeedRationale.length > 0) {
@@ -153,9 +154,10 @@ public class Permiso {
      */
     @MainThread
     public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) {
+        Activity activity = checkActivity();
         if (mCodesToRequests.containsKey(requestCode)) {
             RequestData requestData = mCodesToRequests.get(requestCode);
-            requestData.resultSet.parsePermissionResults(permissions, grantResults, mActivity.get());
+            requestData.resultSet.parsePermissionResults(permissions, grantResults, activity);
             requestData.onResultListener.onPermissionResult(requestData.resultSet);
             mCodesToRequests.remove(requestCode);
         } else {
@@ -196,9 +198,15 @@ public class Permiso {
      */
     @MainThread
     public void showRationaleInDialog(final PermisoDialogFragment.Builder builder, final IOnRationaleProvided rationaleCallback) {
-        checkActivity();
+        Activity activity = checkActivity();
+        FragmentManager fm = activity.getFragmentManager();
 
-        PermisoDialogFragment dialogFragment = builder.build(mActivity.get());
+        PermisoDialogFragment dialogFragment = (PermisoDialogFragment) fm.findFragmentByTag(PermisoDialogFragment.TAG);
+        if (dialogFragment != null) {
+            dialogFragment.dismiss();
+        }
+
+        dialogFragment = builder.build(activity);
 
         // We show the rationale after the dialog is closed. We use setRetainInstance(true) in the dialog to ensure that
         // it retains the listener after an app rotation.
@@ -208,8 +216,9 @@ public class Permiso {
                 rationaleCallback.onRationaleProvided();
             }
         });
-        dialogFragment.show(mActivity.get().getFragmentManager(), PermisoDialogFragment.TAG);
+        dialogFragment.show(fm, PermisoDialogFragment.TAG);
     }
+
     // =====================================================================
     // Private
     // =====================================================================
@@ -273,18 +282,21 @@ public class Permiso {
      * @param requestCode The request code of the request you want to run.
      */
     private void makePermissionRequest(int requestCode) {
+        Activity activity = checkActivity();
         RequestData requestData = mCodesToRequests.get(requestCode);
-        ActivityCompat.requestPermissions(mActivity.get(), requestData.resultSet.getUngrantedPermissions(), requestCode);
+        ActivityCompat.requestPermissions(activity, requestData.resultSet.getUngrantedPermissions(), requestCode);
     }
 
     /**
      * Ensures that our WeakReference to the Activity is still valid. If it isn't, throw an exception saying that the
      * Activity needs to be set.
      */
-    private void checkActivity() {
-        if (mActivity.get() == null) {
+    private Activity checkActivity() {
+        Activity activity = mActivity.get();
+        if (activity == null) {
             throw new IllegalStateException("No activity set. Either subclass PermisoActivity or call Permiso.setActivity() in onCreate() and onResume() of your Activity.");
         }
+        return activity;
     }
 
 
