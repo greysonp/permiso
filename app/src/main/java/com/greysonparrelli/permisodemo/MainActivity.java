@@ -77,9 +77,10 @@ public class MainActivity extends PermisoActivity {
 
             @Override
             public void onRationaleRequested(Permiso.IOnRationaleProvided callback, String... permissions) {
-                PermisoDialogFragment.Builder builder = new PermisoDialogFragment.Builder(R.string.permission_rationale,
-                                                                                        R.string.needed_for_html_demo_purposes,
-                                                                                        android.R.string.ok);
+                PermisoDialogFragment.Builder builder = new PermisoDialogFragment.Builder(
+                        R.string.permission_rationale,
+                        R.string.needed_for_html_demo_purposes,
+                        android.R.string.ok);
                 builder.setHtmlInterpretation(true);
                 Permiso.getInstance().showRationaleInDialog(builder, callback);
             }

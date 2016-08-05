@@ -178,9 +178,10 @@ public class Permiso {
      */
     @MainThread
     public void showRationaleInDialog(@Nullable String title, @NonNull String message, @Nullable String buttonText, @NonNull final IOnRationaleProvided rationaleCallback) {
-        PermisoDialogFragment.Builder builder = new PermisoDialogFragment.Builder().setTitle(title)
-                                                                                .setMessage(message)
-                                                                                .setButtonText(buttonText);
+        PermisoDialogFragment.Builder builder = new PermisoDialogFragment.Builder()
+                .setTitle(title)
+                .setMessage(message)
+                .setButtonText(buttonText);
         showRationaleInDialog(builder, rationaleCallback);
     }
 
