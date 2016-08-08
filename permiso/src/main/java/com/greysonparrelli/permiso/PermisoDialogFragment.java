@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v7.app.AlertDialog;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
@@ -40,11 +41,14 @@ public class PermisoDialogFragment extends DialogFragment {
      * @param buttonText The text to label the dialog button. If null, defaults to {@link android.R.string#ok}.
      * @return A new {@link PermisoDialogFragment}.
      */
-    public static PermisoDialogFragment newInstance(@Nullable String title, @NonNull String message, @Nullable String buttonText) {
+    public static PermisoDialogFragment newInstance(
+            @Nullable String title,
+            @NonNull String message,
+            @Nullable String buttonText) {
         return newInstance(new Builder()
-                        .setTitle(title)
-                        .setMessage(message)
-                        .setButtonText(buttonText));
+                .setTitle(title)
+                .setMessage(message)
+                .setButtonText(buttonText));
     }
 
     private static PermisoDialogFragment newInstance(@NonNull Builder builder) {
@@ -131,7 +135,7 @@ public class PermisoDialogFragment extends DialogFragment {
     /**
      * Sets the listener that will be triggered when this dialog is closed by a user action. This includes clicking
      * the dismissal button as well as clicking in the area outside of the dialog. NOT triggered by rotation.
-     * @param listener
+     * @param listener Listener you want triggered when this dialog is closed by a user action.
      */
     public void setOnCloseListener(IOnCloseListener listener) {
         mOnCloseListener = listener;
@@ -148,16 +152,18 @@ public class PermisoDialogFragment extends DialogFragment {
         void onClose();
     }
 
+    /**
+     * Build a {@link PermisoDialogFragment}. Gives the opportunity to set strings using either a raw string or a
+     * resource id.
+     */
     public static class Builder {
         private int titleId = 0;
         private String title = null;
         private int buttonTextId = 0;
         private String message = null;
         private int messageId = 0;
-        // by default, interpret the dialog msg body as string text
         private boolean interpretHtml = false;
         private String buttonText = null;
-
 
         public Builder() {}
 
@@ -167,20 +173,65 @@ public class PermisoDialogFragment extends DialogFragment {
             this.buttonTextId = buttonTextId;
         }
 
+        // =====================================================================
+        // Getters
+        // =====================================================================
 
-        public String getTitle() { return title; }
-        public String getMessage() { return message; }
-        public String getButtonText() { return buttonText; }
-        public boolean isHtml() { return interpretHtml; }
+        public String getTitle() {
+            return title;
+        }
 
-        public Builder setTitle(int val) { titleId = val; return this; }
-        public Builder setTitle(String val) { title = val; return this; }
-        public Builder setMessage(String val) { message = val; return this; }
-        public Builder setMessage(int val) { messageId = val; return this; }
-        public Builder setButtonText(int stringId) { buttonTextId = stringId; return this; }
-        public Builder setButtonText(String string) { buttonText = string; return this; }
-        public Builder setHtmlInterpretation(boolean interpretHtml) { this.interpretHtml = interpretHtml; return this; }
+        public String getMessage() {
+            return message;
+        }
 
+        public String getButtonText() {
+            return buttonText;
+        }
+
+        public boolean isHtml() {
+            return interpretHtml;
+        }
+
+
+        // =====================================================================
+        // Setters
+        // =====================================================================
+
+        public Builder setTitle(@StringRes int val) {
+            titleId = val;
+            return this;
+        }
+
+        public Builder setTitle(String val) {
+            title = val;
+            return this;
+        }
+
+        public Builder setMessage(@StringRes int val) {
+            messageId = val;
+            return this;
+        }
+
+        public Builder setMessage(String val) {
+            message = val;
+            return this;
+        }
+
+        public Builder setButtonText(@StringRes int stringId) {
+            buttonTextId = stringId;
+            return this;
+        }
+
+        public Builder setButtonText(String string) {
+            buttonText = string;
+            return this;
+        }
+
+        public Builder setHtmlInterpretation(boolean interpretHtml) {
+            this.interpretHtml = interpretHtml;
+            return this;
+        }
 
         public PermisoDialogFragment build(Context context) {
             if (titleId > 0) { title = context.getString(titleId); }
