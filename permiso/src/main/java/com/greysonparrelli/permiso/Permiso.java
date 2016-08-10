@@ -179,7 +179,11 @@ public class Permiso {
      *      The callback to be trigger
      */
     @MainThread
-    public void showRationaleInDialog(@Nullable String title, @NonNull String message, @Nullable String buttonText, @NonNull final IOnRationaleProvided rationaleCallback) {
+    public void showRationaleInDialog(
+            @Nullable String title,
+            @NonNull String message,
+            @Nullable String buttonText,
+            @NonNull final IOnRationaleProvided rationaleCallback) {
         PermisoDialogFragment.Builder builder = new PermisoDialogFragment.Builder()
                 .setTitle(title)
                 .setMessage(message)
@@ -197,7 +201,9 @@ public class Permiso {
      *      The callback to be trigger
      */
     @MainThread
-    public void showRationaleInDialog(final PermisoDialogFragment.Builder builder, final IOnRationaleProvided rationaleCallback) {
+    public void showRationaleInDialog(
+            final PermisoDialogFragment.Builder builder,
+            final IOnRationaleProvided rationaleCallback) {
         Activity activity = checkActivity();
         FragmentManager fm = activity.getFragmentManager();
 

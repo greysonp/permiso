@@ -21,6 +21,7 @@ public class MainActivity extends PermisoActivity {
     // Overrides
     // =====================================================================
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -108,7 +109,11 @@ public class MainActivity extends PermisoActivity {
 
             @Override
             public void onRationaleRequested(Permiso.IOnRationaleProvided callback, String... permissions) {
-                Permiso.getInstance().showRationaleInDialog(getString(R.string.permission_rationale), getString(R.string.needed_for_demo_purposes), null, callback);
+                Permiso.getInstance().showRationaleInDialog(
+                        getString(R.string.permission_rationale),
+                        getString(R.string.needed_for_demo_purposes),
+                        null,
+                        callback);
             }
         }, Manifest.permission.READ_CONTACTS, Manifest.permission.READ_CALENDAR);
     }
@@ -130,15 +135,25 @@ public class MainActivity extends PermisoActivity {
             @Override
             public void onPermissionResult(Permiso.ResultSet resultSet) {
                 if (resultSet.areAllPermissionsGranted()) {
-                    Toast.makeText(MainActivity.this, R.string.permission_granted + " (" + requestNumber + ")", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(
+                            MainActivity.this,
+                            getString(R.string.permission_granted) + " (" + requestNumber + ")",
+                            Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(MainActivity.this, R.string.permission_denied + " (" + requestNumber + ")", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(
+                            MainActivity.this,
+                            getString(R.string.permission_denied) + " (" + requestNumber + ")",
+                            Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onRationaleRequested(Permiso.IOnRationaleProvided callback, String... permissions) {
-                Permiso.getInstance().showRationaleInDialog(getString(R.string.permission_rationale), getString(R.string.needed_for_demo_purposes), null, callback);
+                Permiso.getInstance().showRationaleInDialog(
+                        getString(R.string.permission_rationale),
+                        getString(R.string.needed_for_demo_purposes),
+                        null,
+                        callback);
             }
         }, Manifest.permission.CAMERA);
     }
