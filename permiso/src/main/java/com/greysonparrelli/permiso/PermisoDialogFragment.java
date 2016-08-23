@@ -26,10 +26,12 @@ public class PermisoDialogFragment extends DialogFragment {
     private static final String KEY_MESSAGE = "message";
     private static final String KEY_BUTTON_TEXT = "button_text";
     private static final String KEY_HAS_HTML = "has_html";
+    private static final String KEY_THEME_ID = "theme_id";
 
     private String mTitle;
     private String mMessage;
     private String mButtonText;
+    private int mThemeId;
 
     private IOnCloseListener mOnCloseListener;
 
@@ -59,6 +61,7 @@ public class PermisoDialogFragment extends DialogFragment {
         args.putString(KEY_TITLE, builder.getTitle());
         args.putString(KEY_MESSAGE, builder.getMessage());
         args.putString(KEY_BUTTON_TEXT, builder.getButtonText());
+        args.putInt(KEY_THEME_ID, builder.getThemeId());
         dialogFragment.setArguments(args);
 
         return dialogFragment ;
@@ -74,6 +77,7 @@ public class PermisoDialogFragment extends DialogFragment {
         mTitle = getArguments().getString(KEY_TITLE);
         mMessage = getArguments().getString(KEY_MESSAGE);
         mButtonText = getArguments().getString(KEY_BUTTON_TEXT);
+        mThemeId = getArguments().getInt(KEY_THEME_ID);
     }
 
     @Override
@@ -89,7 +93,7 @@ public class PermisoDialogFragment extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), mThemeId);
 
         // Title
         if (mTitle != null) {
@@ -164,6 +168,7 @@ public class PermisoDialogFragment extends DialogFragment {
         private int messageId = 0;
         private boolean interpretHtml = false;
         private String buttonText = null;
+        private int themeId = 0;
 
         public Builder() {}
 
@@ -191,6 +196,10 @@ public class PermisoDialogFragment extends DialogFragment {
 
         public boolean isHtml() {
             return interpretHtml;
+        }
+
+        public int getThemeId() {
+            return themeId;
         }
 
 
@@ -230,6 +239,11 @@ public class PermisoDialogFragment extends DialogFragment {
 
         public Builder setHtmlInterpretation(boolean interpretHtml) {
             this.interpretHtml = interpretHtml;
+            return this;
+        }
+
+        public Builder setThemeId(int themeId) {
+            this.themeId = themeId;
             return this;
         }
 
