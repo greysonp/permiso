@@ -59,12 +59,24 @@ Permiso.getInstance().requestPermissions(new Permiso.IOnPermissionResult() {
 
 Gradle
 ------
+### Latest Stable Version
 ```java
 dependencies {
     compile 'com.greysonparrelli.permiso:permiso:0.3.0'
 }
 ```
 
+### Latest Dev Version
+```java
+// In your top-level build.gradle
+repositories {
+    maven { url "https://www.jitpack.io" }
+}
+// In your module's build.gradle
+dependencies {
+    compile 'com.github.greysonp:permiso:master-SNAPSHOT'
+}
+```
 FAQ
 ---
 **I don't want my Activity to subclass ```PermisoActivity```. Do I have to?**

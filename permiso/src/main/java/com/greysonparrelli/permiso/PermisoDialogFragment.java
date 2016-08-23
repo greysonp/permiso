@@ -31,6 +31,7 @@ public class PermisoDialogFragment extends DialogFragment {
     private String mTitle;
     private String mMessage;
     private String mButtonText;
+    private boolean mHasHtml;
     private int mThemeId;
 
     private IOnCloseListener mOnCloseListener;
@@ -77,6 +78,7 @@ public class PermisoDialogFragment extends DialogFragment {
         mTitle = getArguments().getString(KEY_TITLE);
         mMessage = getArguments().getString(KEY_MESSAGE);
         mButtonText = getArguments().getString(KEY_BUTTON_TEXT);
+        mHasHtml = getArguments().getBoolean(KEY_HAS_HTML);
         mThemeId = getArguments().getInt(KEY_THEME_ID);
     }
 
@@ -101,7 +103,7 @@ public class PermisoDialogFragment extends DialogFragment {
         }
 
         // Message
-        if (getArguments().getBoolean(KEY_HAS_HTML)) {
+        if (mHasHtml) {
             TextView msg = new TextView(getActivity());
             msg.setText(Html.fromHtml(mMessage));
             msg.setMovementMethod(LinkMovementMethod.getInstance());
@@ -207,41 +209,65 @@ public class PermisoDialogFragment extends DialogFragment {
         // Setters
         // =====================================================================
 
-        public Builder setTitle(@StringRes int val) {
-            titleId = val;
+        /**
+         * Set the title that will appear at the top of the dialog.
+         */
+        public Builder setTitle(@StringRes int resId) {
+            titleId = resId;
             return this;
         }
 
+        /**
+         * Set the title that will appear at the top of the dialog.
+         */
         public Builder setTitle(String val) {
             title = val;
             return this;
         }
 
-        public Builder setMessage(@StringRes int val) {
-            messageId = val;
+        /**
+         * Set the message that will appear in the body of the dialog.
+         */
+        public Builder setMessage(@StringRes int resId) {
+            messageId = resId;
             return this;
         }
 
+        /**
+         * Set the message that will appear in the body of the dialog.
+         */
         public Builder setMessage(String val) {
             message = val;
             return this;
         }
 
-        public Builder setButtonText(@StringRes int stringId) {
-            buttonTextId = stringId;
+        /**
+         * Set the text that will appear as dismissal button in the corner of the dialog.
+         */
+        public Builder setButtonText(@StringRes int resId) {
+            buttonTextId = resId;
             return this;
         }
 
+        /**
+         * Set the text that will appear as dismissal button in the corner of the dialog.
+         */
         public Builder setButtonText(String string) {
             buttonText = string;
             return this;
         }
 
+        /**
+         * Set whether or not you want the message text to be interpreted as HTML.
+         */
         public Builder setHtmlInterpretation(boolean interpretHtml) {
             this.interpretHtml = interpretHtml;
             return this;
         }
 
+        /**
+         * Set theme id that the {@link AlertDialog} will use.
+         */
         public Builder setThemeId(int themeId) {
             this.themeId = themeId;
             return this;
