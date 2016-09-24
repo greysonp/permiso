@@ -1,6 +1,8 @@
 Permiso [![Build Status](https://travis-ci.org/greysonp/permiso.svg?branch=master)](https://travis-ci.org/greysonp/permiso) [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Permiso-green.svg?style=true)](https://android-arsenal.com/details/1/2818) [![Join the chat at https://gitter.im/permiso/Lobby](https://badges.gitter.im/permiso/Lobby.svg)](https://gitter.im/permiso/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 =======
 
+[![Join the chat at https://gitter.im/permiso/github-events](https://badges.gitter.im/permiso/github-events.svg)](https://gitter.im/permiso/github-events?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Permiso is an Android library that makes requesting runtime permissions a whole lot easier.
 
 Have you seen the [docs](http://developer.android.com/training/permissions/requesting.html) for how to request runtime permissions? Who wants to do *that* every time you request a permission? Let's clean this up!
