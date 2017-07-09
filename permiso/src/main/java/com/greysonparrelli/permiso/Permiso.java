@@ -130,11 +130,11 @@ public class Permiso {
                     requestData.onResultListener.onRationaleRequested(new IOnRationaleProvided() {
                         @Override
                         public void onRationaleProvided() {
-                            makePermissionRequest(requestCode);
+                            makePermissionRequest(requestCode, requestData);
                         }
                     }, permissionsThatNeedRationale);
                 } else {
-                    makePermissionRequest(requestCode);
+                    makePermissionRequest(requestCode, requestData);
                 }
             }
         }
@@ -286,10 +286,10 @@ public class Permiso {
     /**
      * Makes the permission request for the request that matches the provided request code.
      * @param requestCode The request code of the request you want to run.
+     * @param requestData The {@link RequestData} representing the request you want to run.
      */
-    private void makePermissionRequest(int requestCode) {
+    private void makePermissionRequest(int requestCode, RequestData requestData) {
         Activity activity = checkActivity();
-        RequestData requestData = mCodesToRequests.get(requestCode);
         ActivityCompat.requestPermissions(activity, requestData.resultSet.getUngrantedPermissions(), requestCode);
     }
 
