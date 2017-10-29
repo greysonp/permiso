@@ -16,6 +16,7 @@ buildscript {
 
 allprojects {
     repositories {
+        google() // new which replace https://maven.google.com
         jcenter()
     }
 }
